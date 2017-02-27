@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block body %}
+{% if session.logged_in %}
+<li>
+    {% if user_data %}
+        <h2>{{ user_data.name }}</h2>
+        <h2>{{ user_data.email }}</h2>
+    {% endif %}
+    {% if user_diploma %}
+        {% for diploma in user_diploma %}
+            <h2>{{ diploma.school }}</h2>
+        {% endfor %}
+    {% endif %}
+    {% if user_experiences %}
+        {% for experience in user_experiences %}
+            <h2>{{ experience.title }}</h2>
+            <h2>{{ experience.corporation }}</h2>
+            <h2>{{ experience.location }}</h2>
+            <h2>{{ experience.year }}</h2>
+        {% endfor %}
+    {% endif %}
+</li>
+<form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+    <dl>
+        <dt>Title:
+        <dd><input type=text size=30 name=title>
+        <dt>Text:
+        <dd><textarea name=text rows=5 cols=40></textarea>
+        <dd><input type=submit value=Share>
+    </dl>
+</form>
+{% endif %}
+<ul class=entries>
+    {% for entry in entries %}
+    <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}</li>
+    {% for reply in replies %}
+    {% if reply.entry_id == entry.id %}
+    <dd><h4>{{ reply.reply }}</h4>
+        {% endif %}
+        {% endfor %}
+        <form action="{{'add_reply/%d' % entry.id}}" method="post">
+            <textarea name="reply" rows=1 cols=40></textarea>
+            <input type=submit value=Reply>
+        </form>
+        {% if session.logged_in %}
+        <a href="/delete/{{entry.id}}">
+            <button>delete</button>
+        </a>
+        {% endif %}
+        {% else %}
+        <li><em>Unbelievable. No entries here so far</em>
+            {% endfor %}
+
+</ul>
+{% endblock %}
